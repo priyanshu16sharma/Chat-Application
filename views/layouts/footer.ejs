@@ -1,0 +1,101 @@
+</div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/popper.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+<script>
+    const user_id = '<%= sender%>'
+    console.log("User Id" + ' ' + user_id);
+    let receiver_id;
+
+    // Get all the <li> elements and add a click event listener to each one.
+    document.querySelectorAll('.user-list').forEach((li) => {
+        li.addEventListener('click', (e) => {
+            trial(e);
+        });
+    });
+
+    // Define the trial function.
+    function trial(e) {
+        console.log(e.target.getAttribute('dataId'));
+        receiver_id = e.target.getAttribute('dataId');
+    }
+
+
+
+    const socket = io('/user-namespace', { auth: { token: '<%= sender%>' } });
+
+    const msgInput = document.getElementById('message');
+    const msgSendBtn = document.getElementById('send-message');
+    const msgArea = document.getElementById('chat-area');
+    // console.log(msgArea);
+
+    msgSendBtn.addEventListener('click', async (e) => {
+        console.log("HI CONSOLE")
+        const newChild = ` <div style="text-align: right; margin: 5px; margin-top: 20px; color: black;" class="senders-msg">
+                    <span
+                        style="height: auto; width: auto; padding: 10px; background-color: rgb(247, 156, 171); border: 1px solid rgb(247, 156, 171); border-radius: 15px; color: white;">${msgInput.value}</span>
+                </div>`
+        const postData = {
+            userID: user_id,
+            receiverId: receiver_id,
+            message: msgInput.value
+        };
+
+        console.log(postData);
+
+
+        console.log("Here in footer.js checking if things getting appended");
+        msgArea.insertAdjacentHTML('beforeend', newChild);
+        msgInput.value = "";
+
+        socket.emit("chat-delivery", { msg: postData });
+
+        try {
+            const response = await axios.post('/upload-chat', postData, {
+                headers: {
+                    'Content-Type': 'application/json', // Set the content type according to your data
+                    // You can add other headers if needed
+                },
+            })
+
+            console.log(response + " Response");
+        } catch (e) {
+            console.log(e);
+        }
+    })
+
+    socket.on('getOnlineUser', (data) => {
+
+        const elem = document.getElementById(data.user_id);
+        //console.log(elem);
+        elem.innerText = "Online";
+        elem.style.color = "green";
+    })
+    socket.on('getOfflineUser', (data) => {
+        const elem1 = document.getElementById(data.user_id);
+        //console.log(elem1);
+        elem1.innerText = "Offline";
+        elem1.style.color = "red";
+    })
+    socket.on('chatUpdate', (data) => {
+        console.log(" hmmm");
+        const newChild = `<div style="text-align: left; margin: 5px; margin-top: 20px; color: black;" class="senders-msg">
+                    <span
+                        style="height: auto; width: auto; padding: 10px; background-color: purple; border: 1px solid rgb(247, 156, 171); border-radius: 15px; color: white;">${data.message}</span>
+                </div>`
+        console.log("Here in footer.js checking if things getting appended 2");
+        msgArea.insertAdjacentHTML('beforeend', newChild);
+    }
+    )
+
+
+</script>
+</body>
+
+</html>

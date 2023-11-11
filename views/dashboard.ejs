@@ -1,0 +1,44 @@
+<%- include('layouts/header.ejs') %>
+
+    <h2 class="mb-4">Hi, <%= message %>
+
+    </h2>
+    <div class="d-flex" style="height: 95%; width: 100%;">
+        <div style="width: 30%; height: 100%; background-color: #adaaa3; overflow-y: scroll; overflow-x: hidden;">
+            <ul class="list-group lavda">
+                <% users.map((data, index)=>{%>
+                    <li class="border list-group-item list-group-item-danger d-flex align-items-center user-list"
+                        dataId="<%=data._id%>">
+                        <img src="<%='http://127.0.0.1:8080/'+ data.image %>" alt="" width="50px" height="50px"
+                            class="rounded-circle">
+                        <span class="m-2">
+                            <%= data.name %>
+                        </span>
+                        <% if(data.is_online=="1" ){ %>
+                            <sup style="color: green;" id='<%= data._id%>'>Online</sup>
+                            <%}%>
+                                <% if(data.is_online=="0" ){ %>
+                                    <sup style="color: rgb(249, 11, 11);" id='<%= data._id%>'>Offline</sup>
+                                    <%}%>
+                    </li>
+                    <%})%>
+            </ul>
+
+        </div>
+        <div style="height: 100%; width: 50%; background-color: rgb(174, 228, 228);  position: relative;">
+            <div class="chat-area" id="chat-area"
+                style="height: 92%; width: 100%; background-color: black; overflow-y: scroll; overflow-x: hidden; white-space: normal; overflow-wrap: break-word;">
+
+            </div>
+            <div id="message-input"
+                style="height: 50px; width: 100%; background-color: rgb(53, 52, 52); position: relative; bottom: 0;"
+                class="d-flex">
+                <input type="text" style="width: 90%; height: 100%;" class="rounded-pill p-2" placeholder="Your Message"
+                    id="message">
+                <button class="rounded-circle"
+                    style="background-color: rgb(243, 245, 245); height: 50px; width: 50px; position: relative;"
+                    id="send-message"></button>
+            </div>
+        </div>
+    </div>
+    <%- include('layouts/footer.ejs') %>
